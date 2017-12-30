@@ -16,6 +16,6 @@
     "lodash": "^4.17.4"
   },
   "scripts": {
-    "start": "BABEL_DISABLE_CACHE=1 babel-node ./index.js"
+    "start": "NODE_ENV=development MOCK=1 BABEL_DISABLE_CACHE=1 babel-node ./index.js"
   }
 }

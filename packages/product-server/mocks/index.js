@@ -57,5 +57,15 @@ export default {
         return createTypes(design);
       }
     };
+  },
+  Mutation: () => {
+    return {
+      upvote: (root, { designId }, { userId }) => {
+        return true
+      },
+      downvote: (root, { designId }, { userId }) => {
+        return true
+      }
+    }
   }
 };
