@@ -1,24 +1,20 @@
-import { range, reduce, size } from "lodash";
-const faker = require("faker");
+import { range, reduce, size } from 'lodash';
+import createRedisPublisher from '../../eventador-client/src';
+
+const faker = require('faker');
+
+const pubsub = createRedisPublisher();
 
 function createTypes(factory, number = 10) {
   const rangeItems = range(number);
 
-  return rangeItems.map(() => {
-    return factory();
-  });
+  return rangeItems.map(() => factory());
 }
 
 function design() {
   const likes = createTypes(like);
 
-  const likeCount = reduce(
-    likes,
-    (memo, currentVal) => {
-      return currentVal.vote + memo;
-    },
-    0
-  );
+  const likeCount = reduce(likes, (memo, currentVal) => currentVal.vote + memo, 0);
 
   return {
     designer: designer(),
@@ -27,7 +23,7 @@ function design() {
     createdAt: faker.date.recent(),
     likes,
     likeCount,
-    totalLikes: size(likes)
+    totalLikes: size(likes),
   };
 }
 
@@ -39,33 +35,39 @@ function designer() {
     name: `${firstName} ${lastName}`,
     firstName,
     lastName,
-    avatar: faker.image.avatar()
+    avatar: faker.image.avatar(),
   };
 }
 
 function like() {
   return {
     customerId: faker.random.uuid(),
-    vote: faker.random.boolean() ? 1 : -1
+    vote: faker.random.boolean() ? 1 : -1,
   };
 }
 
 export default {
-  Query: () => {
-    return {
-      designs: (root, {}, context) => {
-        return createTypes(design);
-      }
-    };
-  },
-  Mutation: () => {
-    return {
-      upvote: (root, { designId }, { userId }) => {
-        return true
-      },
-      downvote: (root, { designId }, { userId }) => {
-        return true
-      }
-    }
-  }
+  Query: () => ({
+    designs: (root, {}, context) => createTypes(design),
+  }),
+  Mutation: () => ({
+    upvote: (root, { designId }) => {
+      pubsub.publish(`LIKE_COUNT_CHANGED_${designId}`, {
+        designId,
+        likeCount: {
+          newLikeCount: 2,
+        },
+      });
+      return true;
+    },
+    downvote: (root, { designId }) => {
+      pubsub.publish(`LIKE_COUNT_CHANGED_${designId}`, {
+        designId,
+        likeCount: {
+          newLikeCount: faker.random.number(),
+        },
+      });
+      return true;
+    },
+  }),
 };

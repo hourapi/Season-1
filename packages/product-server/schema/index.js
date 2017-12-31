@@ -1,11 +1,11 @@
-import { makeExecutableSchema, addMockFunctionsToSchema } from "graphql-tools";
-import resolvers from "../resolvers";
+import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
+import resolvers from '../resolvers';
 import mocks from '../mocks';
-import typeDefs from "./typeDefinitions";
+import typeDefs from './typeDefinitions';
 
 const graphqlSchema = makeExecutableSchema({
   typeDefs,
-  resolvers
+  resolvers,
 });
 
 if (process.env.NODE_ENV === 'development' && !!process.env.MOCK) {

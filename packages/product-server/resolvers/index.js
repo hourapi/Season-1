@@ -2,13 +2,11 @@
 
 export default {
   Query: {
-    helloWorld: (root, { name }, context) => {
-      return {
-        message: `Hello ${name}`,
-      };
-    },
+    helloWorld: (root, { name }, context) => ({
+      message: `Hello ${name}`,
+    }),
     designs: () => {
 
-    }
+    },
   },
-}
+};
